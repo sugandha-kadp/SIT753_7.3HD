@@ -6,12 +6,17 @@
   "scripts": {
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
+    "build": "npm run test:api",
     "seed": "node seedContent.js",
     "test:api": "cross-env NODE_ENV=test jest --config testing/config/jest.config.js --runInBand",
     "test:e2e": "cross-env NODE_ENV=test playwright test -c testing/config/playwright.config.js",
+    "test:e2e:ci": "cross-env NODE_ENV=test PLAYWRIGHT_HEADLESS=true CI=1 playwright test -c testing/config/playwright.config.js --reporter=line",
     "test": "npm run test:api",
-    "test:all": "npm run test:api && npm run test:e2e",
-    "report:e2e": "playwright show-report testing/reports/playwright"
+    "test:ci": "npm run test:api && npm run test:e2e:ci",
+    "test:all": "npm run test:ci",
+    "report:e2e": "playwright show-report testing/reports/playwright",
+    "docker:build": "docker build -t courseflow:local .",
+    "docker:run": "docker run --rm -p 5000:5000 --env-file .env courseflow:local"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

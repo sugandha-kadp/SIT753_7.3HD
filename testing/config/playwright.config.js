@@ -19,7 +19,7 @@ module.exports = defineConfig({
   ],
   use: {
     baseURL,
-    headless: false,
+    headless: process.env.CI ? true : process.env.PLAYWRIGHT_HEADLESS === "true" ? true : false,
     trace: "on-first-retry",
     screenshot: "only-on-failure",
     video: "retain-on-failure",
