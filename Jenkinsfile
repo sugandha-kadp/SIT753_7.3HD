@@ -40,6 +40,12 @@ pipeline {
             current_ip='unavailable'
           fi
           echo "Outbound IP (for Atlas allowlist): $current_ip"
+          if [ -n "$MONGODB_URI" ]; then
+            sanitized_uri=$(echo "$MONGODB_URI" | sed -E 's#://([^:]+):([^@]+)@#://\1:***@#')
+            echo "MONGODB_URI (sanitized): $sanitized_uri"
+          else
+            echo "MONGODB_URI is not set"
+          fi
           if npm run | grep -q " seed"; then
             echo "Running database seed script"
             npm run seed
