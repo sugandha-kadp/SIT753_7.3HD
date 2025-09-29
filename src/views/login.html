@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CourseFlow Sign In</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="container">
+    <img src="/img/logo.png" alt="CourseFlow" width="120" style="margin-bottom: 16px;" />
+    <h1 style="margin-bottom: 8px;">Welcome to CourseFlow</h1>
+    <p class="muted" style="margin-bottom: 24px;">Sign in with the instructor or student account provided by your administrator.</p>
+
+    <form id="loginForm" class="form-box" style="display: block;">
+      <div id="loginSuccess" class="success-message"></div>
+      <div id="loginError" class="error-message"></div>
+      <div class="input-field">
+        <i class="material-icons">email</i>
+        <input type="email" id="loginEmail" placeholder="Email address" required />
+      </div>
+      <div class="input-field">
+        <i class="material-icons">lock</i>
+        <input type="password" id="loginPassword" placeholder="Password" required />
+      </div>
+      <button type="submit">Sign In</button>
+    </form>
+
+    <section style="margin-top: 32px;">
+      <h2 style="font-size: 1.2rem; margin-bottom: 8px;">Default Accounts</h2>
+      <p class="muted" style="margin: 0;">Instructor: <code>instructor@example.com</code></p>
+      <p class="muted" style="margin: 4px 0 0;">Student: <code>student@example.com</code></p>
+    </section>
+  </div>
+
+  <script>
+    function showError(message) {
+      const div = document.getElementById('loginError');
+      div.textContent = message;
+      div.style.display = message ? 'block' : 'none';
+    }
+
+    function showSuccess(message) {
+      const div = document.getElementById('loginSuccess');
+      div.textContent = message;
+      div.style.display = message ? 'block' : 'none';
+    }
+
+    function validateEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      showError('');
+      showSuccess('');
+
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      if (!validateEmail(email)) {
+        showError('Enter a valid email address.');
+        return;
+      }
+      if (!password) {
+        showError('Enter your password.');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/users/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.message || 'Login failed');
+        }
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        showSuccess('Login successful! Redirecting...');
+        setTimeout(() => {
+          window.location.href = '/courses';
+        }, 750);
+      } catch (err) {
+        showError(err.message);
+      }
+    });
+  </script>
+</body>
+</html>
