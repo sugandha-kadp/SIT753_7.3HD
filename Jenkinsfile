@@ -3,11 +3,6 @@ pipeline {
 
   options { timestamps() }
 
-  parameters {
-    string(name: 'MONGODB_URI', defaultValue: '', description: 'Atlas connection string')
-    string(name: 'JWT_SECRET',  defaultValue: '', description: 'JWT signing secret')
-  }
-
   environment {
     APP_NAME               = "courseflow"
     ARTIFACT_DIR           = "build"
@@ -17,21 +12,6 @@ pipeline {
   }
 
   stages {
-
-    stage('Init Environment') {
-      steps {
-        script {
-          if (!params.MONGODB_URI?.trim()) {
-            error("MONGODB_URI parameter is required")
-          }
-          if (!params.JWT_SECRET?.trim()) {
-            error("JWT_SECRET parameter is required")
-          }
-          env.MONGODB_URI = params.MONGODB_URI
-          env.JWT_SECRET = params.JWT_SECRET
-        }
-      }
-    }
 
     stage('Build') {
       steps {
@@ -55,24 +35,6 @@ pipeline {
         echo "Starting Test stage"
         sh '''
           set -e
-          current_ip=$(curl -s https://ifconfig.me)
-          if [ -z "$current_ip" ]; then
-            current_ip='unavailable'
-          fi
-          echo "Outbound IP (for Atlas allowlist): $current_ip"
-          if [ -n "$MONGODB_URI" ]; then
-            sanitized_uri=$(echo "$MONGODB_URI" | sed -E 's#://([^:]+):([^@]+)@#://\1:***@#')
-            echo "MONGODB_URI (sanitized): $sanitized_uri"
-          else
-            echo "MONGODB_URI is not set"
-          fi
-          if npm run | grep -q " seed"; then
-            echo "Running database seed script"
-            npm run seed
-          else
-            echo "No 'seed' script found. Skipping seeding."
-          fi
-
           if npm run | grep -q " test"; then
             npm test
           else
@@ -124,5 +86,3 @@ pipeline {
     always  { echo "Post actions complete" }
   }
 }
-
-
