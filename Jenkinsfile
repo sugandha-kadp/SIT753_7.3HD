@@ -38,7 +38,8 @@ pipeline {
           if npm run | grep -q " test"; then
             npm test
           else
-            echo "No 'test' script found. Skipping tests."
+            echo "No 'test' script defined in package.json. Failing stage."
+            exit 1
           fi
         '''
         echo "Test stage completed"
@@ -48,7 +49,18 @@ pipeline {
     stage('Code Quality') {
       steps {
         echo "Starting Code Quality stage"
-        sh 'echo "Code Quality placeholder finished"'
+        sh '''
+          set -e
+          if npm run | grep -q " lint"; then
+            npm run lint
+          elif command -v sonar-scanner >/dev/null 2>&1; then
+            sonar-scanner
+          else
+            echo "No code quality tooling configured (expected npm 'lint' script or sonar-scanner)."
+            exit 1
+          fi
+        '''
+        echo "Code Quality stage completed"
       }
     }
 
