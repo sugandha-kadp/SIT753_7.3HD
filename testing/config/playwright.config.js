@@ -3,12 +3,12 @@ const { defineConfig, devices } = require("@playwright/test");
 
 const baseURL = process.env.PLAYWRIGHT_BASE_URL || "http://127.0.0.1:4173";
 const projectRoot = path.resolve(__dirname, "../..");
-const appEntry = path.join(projectRoot, "src", "app.js");
-const webServerCommand = `npx cross-env PORT=4173 NODE_ENV=test node "${appEntry}"`;
+const serverScript = path.join(projectRoot, "testing", "e2e", "server-with-memory.js");
+const webServerCommand = `node "${serverScript}"`;
 
 module.exports = defineConfig({
   testDir: path.resolve(__dirname, "../e2e/specs"),
-  fullyParallel: true,
+  fullyParallel: false,
   timeout: 60000,
   expect: {
     timeout: 5000,

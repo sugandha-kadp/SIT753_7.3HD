@@ -102,44 +102,63 @@ async function seedUsers() {
 
 async function seedModules() {
   for (const course of modules) {
-    const existing = await Module.findOne({ title: course.title });
     const payload = {
-      ...course,
+      description: course.description,
+      category: course.category,
+      role: course.role,
+      visibility: course.visibility,
+      isArchived: course.isArchived,
       assets: course.assets.map((asset) => ({ ...asset })),
       updatedAt: new Date(),
     };
 
-    if (existing) {
-      existing.set(payload);
-      await existing.save();
-      console.log('Updated module: ' + course.title);
-    } else {
-      await Module.create(payload);
+    const result = await Module.findOneAndUpdate(
+      { title: course.title },
+      { $set: { title: course.title, ...payload } },
+      { new: true, upsert: true, setDefaultsOnInsert: true, rawResult: true }
+    );
+
+    const wasInserted = result.lastErrorObject?.upserted;
+    if (wasInserted) {
       console.log('Created module: ' + course.title);
+    } else {
+      console.log('Upserted module: ' + course.title);
     }
   }
 }
 
-(async () => {
-  try {
-    const uri = process.env.MONGODB_URI;
-    if (!uri) {
-      throw new Error('MONGODB_URI is not defined in the environment.');
-    }
+async function runSeeding(options = {}) {
+  const { reuseConnection = false } = options;
+  const uri = process.env.MONGODB_URI;
+  if (!uri) {
+    throw new Error('MONGODB_URI is not defined in the environment.');
+  }
 
+  const shouldConnect = !reuseConnection && mongoose.connection.readyState !== 1;
+  if (shouldConnect) {
     await mongoose.connect(uri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-
     console.log('Connected to MongoDB');
-    await seedUsers();
-    await seedModules();
-    console.log('Seeding completed.');
-    await mongoose.disconnect();
-    process.exit(0);
-  } catch (err) {
-    console.error('Seeding failed:', err.message);
-    process.exit(1);
   }
-})();
+
+  await seedUsers();
+  await seedModules();
+  console.log('Seeding completed.');
+
+  if (shouldConnect) {
+    await mongoose.disconnect();
+  }
+}
+
+if (require.main === module) {
+  runSeeding()
+    .then(() => process.exit(0))
+    .catch((err) => {
+      console.error('Seeding failed:', err.message);
+      process.exit(1);
+    });
+}
+
+module.exports = { runSeeding };
