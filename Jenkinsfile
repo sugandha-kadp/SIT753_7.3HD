@@ -9,8 +9,6 @@ pipeline {
     TESTING_ENVIRONMENT    = "Courseflow-Staging"
     PRODUCTION_ENVIRONMENT = "Courseflow-Production"
     NAME                   = "Piyum Sugandha"
-    MONGODB_URI            = credentials('atlas-courseflow-uri')
-    JWT_SECRET             = credentials('courseflow-jwt-secret')
   }
 
   stages {
