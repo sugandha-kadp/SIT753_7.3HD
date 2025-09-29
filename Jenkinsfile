@@ -55,7 +55,6 @@ pipeline {
     stage('Code Quality') {
       steps {
         echo "Starting Code Quality stage"
-        echo "Example tools: ESLint, Prettier, SonarQube (placeholder only)"
         sh 'echo "Code Quality placeholder finished"'
       }
     }
@@ -63,7 +62,6 @@ pipeline {
     stage('Security') {
       steps {
         echo "Starting Security stage"
-        echo "Example tools: npm audit, Trivy, Snyk, OWASP Dependency-Check (placeholder only)"
         sh 'echo "Security placeholder finished"'
       }
     }
@@ -71,7 +69,6 @@ pipeline {
     stage('Deploy') {
       steps {
         echo "Starting Deploy stage"
-        echo "Target environment: ${TESTING_ENVIRONMENT} (simulated)"
         sh 'echo "Deploy placeholder finished"'
       }
     }
@@ -79,7 +76,6 @@ pipeline {
     stage('Release') {
       steps {
         echo "Starting Release stage"
-        echo "Promoting to: ${PRODUCTION_ENVIRONMENT} (simulated)"
         sh 'echo "Release placeholder finished"'
       }
     }
