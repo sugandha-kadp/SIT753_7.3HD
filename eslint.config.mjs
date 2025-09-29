@@ -1,10 +1,13 @@
 import js from '@eslint/js';
 
 export default [
+
   {
     ignores: ['node_modules/**', 'test-results/**', 'testing/reports/**'],
   },
+
   js.configs.recommended,
+
   {
     files: ['**/*.js'],
     languageOptions: {
@@ -17,11 +20,15 @@ export default [
         require: 'readonly',
         console: 'readonly',
       },
+      
     },
+
     rules: {
       'no-undef': 'off',
       'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
       'no-empty': 'off',
     },
+
   },
+
 ];
