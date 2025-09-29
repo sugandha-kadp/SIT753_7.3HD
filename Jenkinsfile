@@ -35,6 +35,11 @@ pipeline {
         echo "Starting Test stage"
         sh '''
           set -e
+          current_ip=$(curl -s https://ifconfig.me)
+          if [ -z "$current_ip" ]; then
+            current_ip='unavailable'
+          fi
+          echo "Outbound IP (for Atlas allowlist): $current_ip"
           if npm run | grep -q " seed"; then
             echo "Running database seed script"
             npm run seed
