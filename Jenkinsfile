@@ -46,7 +46,7 @@ pipeline {
       }
     }
 
-    stage('Code Quality') {
+        stage('Code Quality') {
       steps {
         echo "Starting Code Quality stage"
         sh '''
@@ -63,6 +63,7 @@ pipeline {
         echo "Code Quality stage completed"
       }
     }
+
 
     stage('Security') {
       steps {
