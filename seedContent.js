@@ -115,7 +115,7 @@ async function seedModules() {
     const result = await Module.findOneAndUpdate(
       { title: course.title },
       { $set: { title: course.title, ...payload } },
-      { new: true, upsert: true, setDefaultsOnInsert: true, rawResult: true }
+      { new: true, upsert: true, setDefaultsOnInsert: true, includeResultMetadata: true }
     );
 
     const wasInserted = result.lastErrorObject?.upserted;
