@@ -3,17 +3,35 @@ pipeline {
 
   options { timestamps() }
 
+  parameters {
+    string(name: 'MONGODB_URI', defaultValue: '', description: 'Atlas connection string')
+    string(name: 'JWT_SECRET',  defaultValue: '', description: 'JWT signing secret')
+  }
+
   environment {
     APP_NAME               = "courseflow"
     ARTIFACT_DIR           = "build"
     TESTING_ENVIRONMENT    = "Courseflow-Staging"
     PRODUCTION_ENVIRONMENT = "Courseflow-Production"
     NAME                   = "Piyum Sugandha"
-    MONGODB_URI            = credentials('atlas-courseflow-uri')
-    JWT_SECRET             = credentials('courseflow-jwt-secret')
   }
 
   stages {
+
+    stage('Init Environment') {
+      steps {
+        script {
+          if (!params.MONGODB_URI?.trim()) {
+            error("MONGODB_URI parameter is required")
+          }
+          if (!params.JWT_SECRET?.trim()) {
+            error("JWT_SECRET parameter is required")
+          }
+          env.MONGODB_URI = params.MONGODB_URI
+          env.JWT_SECRET = params.JWT_SECRET
+        }
+      }
+    }
 
     stage('Build') {
       steps {
@@ -106,3 +124,5 @@ pipeline {
     always  { echo "Post actions complete" }
   }
 }
+
+
