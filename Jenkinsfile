@@ -35,6 +35,13 @@ pipeline {
         echo "Starting Test stage"
         sh '''
           set -e
+          if npm run | grep -q " seed"; then
+            echo "Running database seed script"
+            npm run seed
+          else
+            echo "No 'seed' script found. Skipping seeding."
+          fi
+
           if npm run | grep -q " test"; then
             npm test
           else
