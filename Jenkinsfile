@@ -46,17 +46,15 @@ pipeline {
       }
     }
 
-        stage('Code Quality') {
+    stage('Code Quality') {
       steps {
         echo "Starting Code Quality stage"
         sh '''
           set -e
           if npm run | grep -q " lint"; then
             npm run lint
-          elif command -v sonar-scanner >/dev/null 2>&1; then
-            sonar-scanner
           else
-            echo "No code quality tooling configured (expected npm 'lint' script or sonar-scanner)."
+            echo "No 'lint' script defined in package.json. Failing stage."
             exit 1
           fi
         '''
@@ -64,11 +62,18 @@ pipeline {
       }
     }
 
-
     stage('Security') {
       steps {
         echo "Starting Security stage"
-        sh 'echo "Security placeholder finished"'
+        sh '''
+          set -e
+          if npm run | grep -q " security:audit"; then
+            npm run security:audit
+          else
+            npm audit
+          fi
+        '''
+        echo "Security stage completed"
       }
     }
 
@@ -99,3 +104,5 @@ pipeline {
     always  { echo "Post actions complete" }
   }
 }
+
+
