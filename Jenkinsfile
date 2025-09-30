@@ -35,10 +35,14 @@ pipeline {
         echo "Starting Test stage"
         sh '''
           set -e
-          if npm run | grep -q " test"; then
+          if npm run | grep -q " test:all"; then
+            npm run test:all
+          elif npm run | grep -q " test:ci"; then
+            npm run test:ci
+          elif npm run | grep -q " test"; then
             npm test
           else
-            echo "No 'test' script defined in package.json. Failing stage."
+            echo "No suitable test script found. Failing stage."
             exit 1
           fi
         '''
@@ -104,5 +108,6 @@ pipeline {
     always  { echo "Post actions complete" }
   }
 }
+
 
 
